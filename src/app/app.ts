@@ -1,13 +1,13 @@
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MsalBroadcastService, MsalService } from '@azure/msal-angular';
 import { EventMessage, EventType, InteractionStatus } from '@azure/msal-browser';
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -21,6 +21,8 @@ export class App implements OnInit {
   protected isIframe = false;
   protected loginDisplay = false;
   protected userName = '';
+  protected userInitials = '';
+  protected sidebarOpen = false;
 
   ngOnInit(): void {
     this.authService.handleRedirectObservable().subscribe();
@@ -56,6 +58,14 @@ export class App implements OnInit {
     this.loginDisplay = this.authService.instance.getAllAccounts().length > 0;
     const active = this.authService.instance.getActiveAccount();
     this.userName = active?.name ?? active?.username ?? '';
+    this.userInitials = this.computeInitials(this.userName);
+  }
+
+  private computeInitials(name: string): string {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
   }
 
   private checkAndSetActiveAccount(): void {
@@ -64,6 +74,10 @@ export class App implements OnInit {
       const accounts = this.authService.instance.getAllAccounts();
       this.authService.instance.setActiveAccount(accounts[0]);
     }
+  }
+
+  protected toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
   }
 
   protected logout(): void {

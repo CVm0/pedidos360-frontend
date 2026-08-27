@@ -7,7 +7,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
-  { path: 'auth/callback', component: AuthCallback },
+  { path: '', component: AuthCallback },
   { path: 'dashboard', component: Dashboard, canActivate: [MsalGuard] },
   { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: '**', redirectTo: 'login' },
